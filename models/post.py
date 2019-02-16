@@ -1,8 +1,10 @@
 from models.database import Database
+import datetime
+
 
 class Post(object):
 
-    def __init__(self, blog_id,  title, content, date, author, id):
+    def __init__(self, blog_id,  title, content, date=datetime.datetime.utcnow(), author, id):
         self.blog_id = blog_id
         self.title = title
         self.content = content
