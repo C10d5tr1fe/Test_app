@@ -1,8 +1,11 @@
 from models.database import Database
+import datetime
+
 
 class Post(object):
 
-    def __init__(self, blog_id,  title, content, date, author, id):
+    #конструктор поста
+    def __init__(self, blog_id,  title, content, author,  date = datetime.datetime.utcnow(), id = None):
         self.blog_id = blog_id
         self.title = title
         self.content = content
@@ -10,9 +13,11 @@ class Post(object):
         self.id = id
         self.create_date = date
 
+    #запись в базу данных поста
     def save_to_mongo(self):
         Database.insert(collection = 'post', data = self.json())
 
+    #json поста
     def json(self):
         return {
             'id':self.id,
@@ -23,14 +28,21 @@ class Post(object):
             'created_date':self.create_date
         }
 
-    @staticmethod
-    def from_mongo(id):
+    #метод поиска поста в бд
+    @classmethod
+    def from_mongo(cls, id):
         #Post.from_mongo('123')
-        return Database.find_one(collection='posts', query={'id':id})
+        post_data = Database.find_one(collection='posts', query={'id':id})
+        return cls( blog_id = post_data['blog_id'],
+                    title = post_data['title'],
+                    content = post_data['content'],
+                    author = post_data['author'],
+                    date = post_data['created_data'],
+                    id = post_data['id'])
 
     @staticmethod
     def from_blog(id):
-        return [ post for post in Database.find(collection = 'post', query={'blog_id':id})]
+        return [post for post in Database.find(collection = 'post', query={'blog_id':id})]
 
 
 
